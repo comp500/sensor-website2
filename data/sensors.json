@@ -47,6 +47,7 @@
 		"htmlDecimal": 0,
 		"graphMin": 0,
 		"graphMax": 65535,
-		"color": "#2196F3"
+		"color": "#2196F3",
+		"autofit": true
 	}
 }

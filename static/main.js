@@ -116,6 +116,15 @@ window.addEventListener("load", function(event) {
 	Object.keys(metadata).forEach((key) => {
 		metadata[key].unit = metadata[key].unit.replace(/&#176;/g, String.fromCharCode(176)); // fix degree symbol
 
+		var ticks = {};
+		if (!metadata[key].autofit) {
+			console.log(metadata[key]);
+			ticks = {
+				min: metadata[key].graphMin,
+				max: metadata[key].graphMax
+			};
+		}
+
 		charts[key] = new Chart(document.getElementById("graph-" + key).getContext("2d"), {
 			type: 'scatter',
 			data: {
@@ -147,10 +156,7 @@ window.addEventListener("load", function(event) {
 					}],
 					yAxes: [{
 						type: 'linear',
-						ticks: {
-							min: metadata[key].graphMin,
-							max: metadata[key].graphMax
-						},
+						ticks: ticks,
 						scaleLabel: {
 							display: true,
 							labelString: metadata[key].measurement
