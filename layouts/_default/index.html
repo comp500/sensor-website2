@@ -1,13 +1,21 @@
 {{ define "body" }}
+	<div id="alertSection">
 	{{ if isset .Site.Params "alert" }}
 		<div class="alert alert-info" role="alert">
-			{{ if isset .Site.Params "alertbold" }}<strong>{{ .Site.Params.AlertBold }}</strong> {{ end }}{{ .Site.Params.Alert }}
+			{{ with .Site.Params.AlertBold }}<strong>{{ . }}</strong> {{ end }}{{ .Site.Params.Alert }}
 		</div>
+	{{ else }}
+		<noscript>
+			<div class="alert alert-warning" role="alert">
+				<strong>Warning:</strong> JavaScript must be enabled for this website to work!
+			</div>
+		</noscript>
 	{{ end }}
+	</div>
 	<div class="container">
 		{{ if isset .Site.Params "preface" }}
 		<div class="jumbotron">
-			{{ if isset .Site.Params "prefacetitle" }}<h1 class="display-4">{{ .Site.Params.PrefaceTitle }}</h1>{{ end }}
+			{{ with .Site.Params.PrefaceTitle }}<h1 class="display-4">{{ . }}</h1>{{ end }}
 			<p class="lead">{{ .Site.Params.Preface }}</p>
 			{{ if isset .Site.Params "prefacebutton" }}
 			<p class="lead">
@@ -24,15 +32,14 @@
 			</p>
 		{{ end }}
 
-		<h3>Latest data</h3>
+		<h3>Latest data <span id="liveHeading" class="text-success d-none" hidden>(Live)</span></h3>
 		<div class="row">
 			{{ range $key, $val := .Site.Data.sensors }}
 			<div class="col-md-3">
 				<div class="card sensor-card">
 					<div class="card-block text-center">
 						<h1 class="display-3" style="color: {{ .color }}">
-						<span id="live-{{ $key }}">...</span>
-						{{ if .small }}<strong class="small-unit">{{ htmlUnescape .unit }}</strong>{{ else }}{{ htmlUnescape .unit }}{{ end }}
+						<span id="live-{{ $key }}" data-decimal="{{ .htmlDecimal }}">...</span>{{ if .small }}<strong class="small-unit">{{ htmlUnescape .unit }}</strong>{{ else }}{{ htmlUnescape .unit }}{{ end }}
 						</h1>
 						<p class="lead">{{ .measurement }}</p>
 						<hr>
@@ -43,7 +50,7 @@
 			{{ end }}
 		</div>
 		<p class="lead">
-			Data recorded <span class="measurementTime">...</span> seconds ago
+			Data recorded <span id="measurementTime">...</span> seconds ago
 		</p>
 		<h3>Graphs</h3>
 		<div class="row">
@@ -64,6 +71,11 @@
 	</div>
 {{ end }}
 {{ define "js" }}
+	{{ with .Site.Params.PubNubKey }}<script defer src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.21.5.min.js" integrity="sha384-fm5cTsS7KdoCP7UkA4lbwMos3T11KAU/6eIvpPvytJvri4NqMVzmwxNS/jNe/ryB" crossorigin="anonymous"></script>
+	<script>var pubNubKey = "{{ . }}";</script>{{ end }}
+	<script>
+		var metadata = {{ .Site.Data.sensors | jsonify }};
+	</script>
 	<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js" integrity="sha256-VNbX9NjQNRW+Bk02G/RO6WiTKuhncWI4Ey7LkSbE+5s=" crossorigin="anonymous"></script>
-	<script defer src="/graphloader.js"></script>
+	<script defer src="/main.js"></script>
 {{ end }}
