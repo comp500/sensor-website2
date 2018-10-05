@@ -1,15 +1,15 @@
 {{ define "body" }}
-	{{ if isset .Site.Params "Alert" }}
+	{{ if isset .Site.Params "alert" }}
 		<div class="alert alert-info" role="alert">
-			{{ if isset .Site.Params "AlertBold" }}<strong>{{ .Site.Params.AlertBold }}</strong> {{ end }}{{ .Site.Params.Alert }}
+			{{ if isset .Site.Params "alertbold" }}<strong>{{ .Site.Params.AlertBold }}</strong> {{ end }}{{ .Site.Params.Alert }}
 		</div>
 	{{ end }}
 	<div class="container">
-		{{ if isset .Site.Params "Preface" }}
+		{{ if isset .Site.Params "preface" }}
 		<div class="jumbotron">
-			{{ if isset .Site.Params "PrefaceTitle" }}<h1 class="display-4">{{ .Site.Params.PrefaceTitle }}</h1>{{ end }}
+			{{ if isset .Site.Params "prefacetitle" }}<h1 class="display-4">{{ .Site.Params.PrefaceTitle }}</h1>{{ end }}
 			<p class="lead">{{ .Site.Params.Preface }}</p>
-			{{ if isset .Site.Params "PrefaceButton" }}
+			{{ if isset .Site.Params "prefacebutton" }}
 			<p class="lead">
 				<a class="btn btn-primary btn-lg" href="{{ .Site.Params.PrefaceHref }}" role="button">{{ .Site.Params.PrefaceButton }}</a>
 			</p>
