@@ -1,6 +1,12 @@
-composer.phar
-/vendor/
+# Created by https://www.gitignore.io/api/hugo
 
-# Commit your application's lock file http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file
-# You may choose to ignore a library lock file http://getcomposer.org/doc/02-libraries.md#lock-file
-# composer.lock
+### Hugo ###
+# Hugo binary
+hugo*
+
+# Generated files at default location
+/public/
+/resources/_gen
+
+
+# End of https://www.gitignore.io/api/hugo

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	{{ .Hugo.Generator }}
+
+	<title>{{ with .Site.Title }}{{.}}{{ else }}RPi Weather Station{{ end }}</title>
+
+	<!-- Bootstrap core CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+
+	<!-- Custom styles -->
+	<link href="/style.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+	<nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
+		<a class="navbar-brand" href="/">{{ with .Site.Title }}{{.}}{{ else }}RPi Weather Station{{ end }}</a>
+		<ul class="navbar-nav mr-auto">
+			{{ $currentPage := . }}
+			{{ range .Site.Menus.main }}
+			<li class="nav-item{{if or ($currentPage.IsMenuCurrent "main" .) ($currentPage.HasMenuCurrent "main" .) }} active{{end}}">
+				<a class="nav-link" href="{{ .URL }}">{{ .Name }}{{if or ($currentPage.IsMenuCurrent "main" .) ($currentPage.HasMenuCurrent "main" .) }} <span class="sr-only">(current)</span>{{end}}</a>
+			</li>
+			{{ end }}
+		</ul>
+	</nav>
+	
+	{{ block "body" . }}{{ end }}
+	
+	<footer class="footer">
+		<div class="container">
+			<p class="text-muted">
+			{{ if isset .Site.Params "FooterText" }}
+				{{ .Site.Params.FooterText }}{{ if isset .Site.Params "FooterLink" }}<a href="{{ .Site.Params.FooterHref }}">{{ .Site.Params.FooterLink }}</a>{{ end }}
+			{{ end }}
+			</p>
+		</div>
+	</footer>
+	
+	{{ block "js" . }}{{ end }}
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+	  ga('create', '{{ .Site.GoogleAnalytics }}', 'auto');
+	  ga('send', 'pageview');
+
+	</script>
+</body>
+
+</html>

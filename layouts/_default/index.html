@@ -1,0 +1,69 @@
+{{ define "body" }}
+	{{ if isset .Site.Params "Alert" }}
+		<div class="alert alert-info" role="alert">
+			{{ if isset .Site.Params "AlertBold" }}<strong>{{ .Site.Params.AlertBold }}</strong> {{ end }}{{ .Site.Params.Alert }}
+		</div>
+	{{ end }}
+	<div class="container">
+		{{ if isset .Site.Params "Preface" }}
+		<div class="jumbotron">
+			{{ if isset .Site.Params "PrefaceTitle" }}<h1 class="display-4">{{ .Site.Params.PrefaceTitle }}</h1>{{ end }}
+			<p class="lead">{{ .Site.Params.Preface }}</p>
+			{{ if isset .Site.Params "PrefaceButton" }}
+			<p class="lead">
+				<a class="btn btn-primary btn-lg" href="{{ .Site.Params.PrefaceHref }}" role="button">{{ .Site.Params.PrefaceButton }}</a>
+			</p>
+			{{ end }}
+			<p class="lead">
+				System status: <span class="text-info" id="systemStatus">Loading...</span>
+			</p>
+		</div>
+		{{ else }}
+			<p>
+				System status: <span class="text-info" id="systemStatus">Loading...</span>
+			</p>
+		{{ end }}
+
+		<h3>Latest data</h3>
+		<div class="row">
+			{{ range $key, $val := .Site.Data.sensors }}
+			<div class="col-md-3">
+				<div class="card sensor-card">
+					<div class="card-block text-center">
+						<h1 class="display-3" style="color: {{ .color }}">
+						<span id="live-{{ $key }}">...</span>
+						{{ if $val.small }}<strong class="small-unit">{{ htmlUnescape $val.unit }}</strong>{{ else }}{{ htmlUnescape $val.unit }}{{ end }}
+						</h1>
+						<p class="lead">{{ $val.measurement }}</p>
+						<hr>
+						<p class="lead">{{ $val.location }}</p>
+					</div>
+				</div>
+			</div>
+			{{ end }}
+		</div>
+		<p class="lead">
+			Data recorded <span class="measurementTime">...</span> seconds ago
+		</p>
+		<h3>Graphs</h3>
+		<div class="row">
+			{{ range $key, $val := .Site.Data.sensors }}
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-block">
+						<h4 class="card-title">{{ $val.measurement }}</h4>
+						<h6 class="card-subtitle text-muted">Sensor {{ $key }} in {{ $val.location }}</h6>
+					</div>
+					<div class="graph-container">
+						<canvas id="graph-{{ $key }}"></canvas>
+					</div>
+				</div>
+			</div>
+			{{ end }}
+		</div>
+	</div>
+{{ end }}
+{{ define "js" }}
+	<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js" integrity="sha256-VNbX9NjQNRW+Bk02G/RO6WiTKuhncWI4Ey7LkSbE+5s=" crossorigin="anonymous"></script>
+	<script defer src="/graphloader.js"></script>
+{{ end }}
