@@ -32,11 +32,11 @@
 					<div class="card-block text-center">
 						<h1 class="display-3" style="color: {{ .color }}">
 						<span id="live-{{ $key }}">...</span>
-						{{ if $val.small }}<strong class="small-unit">{{ htmlUnescape $val.unit }}</strong>{{ else }}{{ htmlUnescape $val.unit }}{{ end }}
+						{{ if .small }}<strong class="small-unit">{{ htmlUnescape .unit }}</strong>{{ else }}{{ htmlUnescape .unit }}{{ end }}
 						</h1>
-						<p class="lead">{{ $val.measurement }}</p>
+						<p class="lead">{{ .measurement }}</p>
 						<hr>
-						<p class="lead">{{ $val.location }}</p>
+						<p class="lead">{{ .location }}</p>
 					</div>
 				</div>
 			</div>
@@ -51,8 +51,8 @@
 			<div class="col-md-6">
 				<div class="card">
 					<div class="card-block">
-						<h4 class="card-title">{{ $val.measurement }}</h4>
-						<h6 class="card-subtitle text-muted">Sensor {{ $key }} in {{ $val.location }}</h6>
+						<h4 class="card-title">{{ .measurement }}</h4>
+						<h6 class="card-subtitle text-muted">Sensor {{ $key }} in {{ .location }}</h6>
 					</div>
 					<div class="graph-container">
 						<canvas id="graph-{{ $key }}"></canvas>
