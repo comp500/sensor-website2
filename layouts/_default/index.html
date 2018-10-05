@@ -74,7 +74,7 @@
 	{{ with .Site.Params.PubNubKey }}<script defer src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.21.5.min.js" integrity="sha384-fm5cTsS7KdoCP7UkA4lbwMos3T11KAU/6eIvpPvytJvri4NqMVzmwxNS/jNe/ryB" crossorigin="anonymous"></script>
 	<script>var pubNubKey = "{{ . }}";</script>{{ end }}
 	<script>
-		var metadata = {{ .Site.Data.sensors | jsonify }};
+		var metadata = {{ jsonify .Site.Data.sensors | safeJS }};
 	</script>
 	<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js" integrity="sha256-VNbX9NjQNRW+Bk02G/RO6WiTKuhncWI4Ey7LkSbE+5s=" crossorigin="anonymous"></script>
 	<script defer src="/main.js"></script>
