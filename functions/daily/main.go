@@ -47,7 +47,7 @@ func (d StoredData) Load(props []datastore.Property) error {
 				var val2 int
 				val2, ok = p.Value.(int)
 				if !ok {
-					return errors.New("Sensor value is not a string or an int")
+					return errors.New("Sensor value is not a string or an int: " + p.Name)
 				}
 				val = strconv.Itoa(val2)
 			}
