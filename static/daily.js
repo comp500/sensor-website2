@@ -64,4 +64,39 @@ window.addEventListener("load", function(event) {
 			}
 		});
 	});
+
+	var oReq = new XMLHttpRequest();
+
+	oReq.onreadystatechange = function () {
+		if (oReq.readyState === XMLHttpRequest.DONE) {
+			if (oReq.status === 200) {
+				var data = JSON.parse(this.responseText);
+
+				var graphData = {};
+				data.forEach((currData) => {
+					var time = new Date(currData.Recorded);
+					Object.keys(currData.SensorValues).forEach((sensorID) => {
+						if (!graphData[sensorID]) {
+							graphData[sensorID] = [];
+						}
+						graphData[sensorID].push({
+							x: time,
+							y: currData.SensorValues[sensorID]
+						});
+					});
+				});
+
+				Object.keys(charts).forEach((sensorID) => {
+					charts[sensorID].chart.data.datasets[0].data = graphData[sensorID];
+					charts[sensorID].chart.update();
+				});
+			} else {
+				sendAlert("Failed to retrieve data: " + this.responseText);
+			}
+		}
+	};
+
+	oReq.open("GET", "/.netlify/functions/daily");
+	oReq.send();
+
 }, false);

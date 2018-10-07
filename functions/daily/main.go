@@ -104,6 +104,9 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
 		Body:       string(output),
+		Headers: map[string]string{
+			"Content-Type": "application/json"
+		}
 	}, nil
 }
 
