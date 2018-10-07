@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"cloud.google.com/go/datastore"
@@ -23,6 +25,57 @@ var client *datastore.Client
 var startupError error
 var ctx context.Context
 
+// StoredData is a single cloud datastore entity
+type StoredData struct {
+	SensorValues map[int]string
+	Recorded     time.Time
+}
+
+// Load loads the datastore property into StoredData
+func (d StoredData) Load(props []datastore.Property) error {
+	for _, p := range props {
+		if p.Name == "recorded" {
+			val, ok := p.Value.(time.Time)
+			if !ok {
+				return errors.New("Recorded is not a time.Time")
+			}
+			d.Recorded = val
+		} else {
+			val, ok := p.Value.(string)
+			if !ok {
+				var val2 int
+				val2, ok = p.Value.(int)
+				if !ok {
+					return errors.New("Sensor value is not a string or an int")
+				}
+				val = strconv.Itoa(val2)
+			}
+			sensorID, err := strconv.Atoi(p.Name)
+			if err != nil {
+				return err
+			}
+			d.SensorValues[sensorID] = val
+		}
+	}
+	return nil
+}
+
+// Save saves the StoredData into a datastore property
+func (d StoredData) Save() ([]datastore.Property, error) {
+	props := make([]datastore.Property, 1)
+	props[0] = datastore.Property{
+		Name:  "recorded",
+		Value: d.Recorded,
+	}
+	for k, v := range d.SensorValues {
+		props = append(props, datastore.Property{
+			Name:  strconv.Itoa(k),
+			Value: v,
+		})
+	}
+	return props, nil
+}
+
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	if startupError != nil {
 		return events.APIGatewayProxyResponse{
@@ -31,7 +84,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		}, nil
 	}
 
-	var data []map[string]string
+	var data []StoredData
 
 	now := time.Now().UTC()
 	yesterday := time.Date(now.Year(), now.Month(), now.Day()-1, 0, 0, 0, 0, time.UTC)
