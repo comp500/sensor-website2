@@ -33,6 +33,7 @@ type StoredData struct {
 
 // Load loads the datastore property into StoredData
 func (d StoredData) Load(props []datastore.Property) error {
+	d.SensorValues = make(map[int]string)
 	for _, p := range props {
 		if p.Name == "recorded" {
 			val, ok := p.Value.(time.Time)
