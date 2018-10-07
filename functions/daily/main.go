@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 	"time"
 
@@ -33,7 +32,7 @@ type StoredData struct {
 }
 
 // Load loads the datastore property into StoredData
-func (d StoredData) Load(props []datastore.Property) error {
+func (d *StoredData) Load(props []datastore.Property) error {
 	d.SensorValues = make(map[int]string)
 	for _, p := range props {
 		if p.Name == "recorded" {
@@ -49,7 +48,6 @@ func (d StoredData) Load(props []datastore.Property) error {
 			}
 			// This is lazy.
 			// Don't do this ever again.
-			log.Printf("%v: %v", p.Name, p.Value)
 			d.SensorValues[sensorID] = fmt.Sprintf("%v", p.Value)
 		}
 	}
@@ -57,7 +55,7 @@ func (d StoredData) Load(props []datastore.Property) error {
 }
 
 // Save saves the StoredData into a datastore property
-func (d StoredData) Save() ([]datastore.Property, error) {
+func (d *StoredData) Save() ([]datastore.Property, error) {
 	props := make([]datastore.Property, 1)
 	props[0] = datastore.Property{
 		Name:  "recorded",
