@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 	"time"
 
@@ -48,6 +49,7 @@ func (d StoredData) Load(props []datastore.Property) error {
 			}
 			// This is lazy.
 			// Don't do this ever again.
+			log.Printf("%v: %v", p.Name, p.Value)
 			d.SensorValues[sensorID] = fmt.Sprintf("%v", p.Value)
 		}
 	}
