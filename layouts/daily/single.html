@@ -1,0 +1,40 @@
+{{ define "body" }}
+	<div id="alertSection">
+	{{ if isset .Site.Params "alert" }}
+		<div class="alert alert-info" role="alert">
+			{{ with .Site.Params.AlertBold }}<strong>{{ . }}</strong> {{ end }}{{ .Site.Params.Alert }}
+		</div>
+	{{ else }}
+		<noscript>
+			<div class="alert alert-warning" role="alert">
+				<strong>Warning:</strong> JavaScript must be enabled for this website to work!
+			</div>
+		</noscript>
+	{{ end }}
+	</div>
+	<div class="container">
+		<h3>Graphs</h3>
+		<div class="row">
+			{{ range $key, $val := .Site.Data.sensors }}
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-block">
+						<h4 class="card-title">{{ .measurement }}</h4>
+						<h6 class="card-subtitle text-muted">Sensor {{ $key }} in {{ .location }}</h6>
+					</div>
+					<div class="graph-container">
+						<canvas id="graph-{{ $key }}"></canvas>
+					</div>
+				</div>
+			</div>
+			{{ end }}
+		</div>
+	</div>
+{{ end }}
+{{ define "js" }}
+	<script>
+		var metadata = {{ jsonify .Site.Data.sensors | safeJS }};
+	</script>
+	<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.min.js" integrity="sha256-VNbX9NjQNRW+Bk02G/RO6WiTKuhncWI4Ey7LkSbE+5s=" crossorigin="anonymous"></script>
+	<script defer src="/daily.js"></script>
+{{ end }}

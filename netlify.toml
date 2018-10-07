@@ -1,0 +1,12 @@
+[build]
+  command = "make build"
+  functions = "functions-dist"
+  publish = "public"
+[build.environment]
+  HUGO_VERSION = "0.49"
+[template.environment]
+  HUGO_GOOGLEANALYTICS = ""
+  HUGO_PARAMS = ""
+  HUGO_TITLE = ""
+  GCP_PROJECT_ID = ""
+  GCP_CREDENTIALS_JSON = ""

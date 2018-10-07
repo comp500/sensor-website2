@@ -10,3 +10,5 @@ hugo*
 
 
 # End of https://www.gitignore.io/api/hugo
+
+functions-dist/
