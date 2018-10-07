@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -15,7 +16,7 @@ import (
 // GCPprojectID is the Google Cloud Platform project ID for Cloud Datastore
 var GCPprojectID string
 
-// GCPcredJSON is the Google Cloud Platform JSON credentials data for Cloud Datastore
+// GCPcredJSON is the Google Cloud Platform JSON credentials data for Cloud Datastore, encoded with base64
 var GCPcredJSON string
 
 var client *datastore.Client
@@ -63,7 +64,13 @@ func main() {
 	ctx = context.Background()
 
 	// Creates a client.
-	client, startupError = datastore.NewClient(ctx, GCPprojectID, option.WithCredentialsJSON([]byte(GCPcredJSON)))
+	var credentials []byte
+	credentials, startupError = base64.StdEncoding.DecodeString(GCPcredJSON)
+	if startupError != nil {
+		lambda.Start(handler)
+		return
+	}
+	client, startupError = datastore.NewClient(ctx, GCPprojectID, option.WithCredentialsJSON(credentials))
 
 	// Make the handler available for Remote Procedure Call by AWS Lambda
 	lambda.Start(handler)
