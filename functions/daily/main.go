@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"reflect"
 	"strconv"
 	"time"
 
@@ -47,7 +48,7 @@ func (d StoredData) Load(props []datastore.Property) error {
 				var val2 int
 				val2, ok = p.Value.(int)
 				if !ok {
-					return errors.New("Sensor value is not a string or an int: " + p.Name)
+					return errors.New("Sensor value is not a string or an int: " + p.Name + " " + reflect.TypeOf(p.Value).String())
 				}
 				val = strconv.Itoa(val2)
 			}
