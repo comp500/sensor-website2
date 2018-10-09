@@ -13,6 +13,9 @@
 	{{ end }}
 	</div>
 	<div class="container">
+		<p class="lead mt-4">
+			This page shows the data recorded on the previous day.
+		</p>
 		<h3>Graphs</h3>
 		<div class="row">
 			{{ range $key, $val := .Site.Data.sensors }}
