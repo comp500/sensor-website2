@@ -27,7 +27,7 @@ var DataTimezone string
 var client *datastore.Client
 var startupError error
 var ctx context.Context
-var timezoneLocation time.Location
+var timezoneLocation *time.Location
 
 // StoredData is a single cloud datastore entity
 type StoredData struct {
@@ -130,5 +130,5 @@ func main() {
 	if startupError != nil {
 		return
 	}
-	timezoneLocation, startupError := time.LoadLocation(DataTimezone)
+	timezoneLocation, startupError = time.LoadLocation(DataTimezone)
 }
