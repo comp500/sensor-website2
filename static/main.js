@@ -7,9 +7,9 @@ window.addEventListener("load", function(event) {
 		`;
 	}
 	
-	var currentMeasurementTime = -1;
+	var currentMeasurementTime = null;
 	window.setInterval(function () {
-		if (currentMeasurementTime > -1) {
+		if (currentMeasurementTime != null) {
 			currentMeasurementTime++;
 			document.getElementById("measurementTime").innerText = currentMeasurementTime;
 		}
