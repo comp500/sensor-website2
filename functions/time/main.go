@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -8,9 +9,9 @@ import (
 )
 
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	time := time.Now().UTC().Format(time.RFC3339)
+	time := time.Now().UTC().Unix() * 1000
 
-	timeJS := "const correctTime = \"" + time + "\";"
+	timeJS := "const correctTime = new Date(" + strconv.FormatInt(time, 10) + ");"
 
 	return events.APIGatewayProxyResponse{
 		StatusCode: 200,
