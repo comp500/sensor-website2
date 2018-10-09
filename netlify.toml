@@ -4,6 +4,7 @@
   publish = "public"
 [build.environment]
   HUGO_VERSION = "0.49"
+  GO_IMPORT_PATH = "github.com/comp500/sensor-website2/functions/daily"
 [template.environment]
   HUGO_GOOGLEANALYTICS = ""
   HUGO_PARAMS = ""
