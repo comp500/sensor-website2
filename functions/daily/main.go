@@ -21,9 +21,13 @@ var GCPprojectID string
 // GCPcredJSON is the Google Cloud Platform JSON credentials data for Cloud Datastore, encoded with base64
 var GCPcredJSON string
 
+// DataTimezone is the IANA Time Zone name for the timezone of the data to be queried
+var DataTimezone string
+
 var client *datastore.Client
 var startupError error
 var ctx context.Context
+var timezoneLocation time.Location
 
 // StoredData is a single cloud datastore entity
 type StoredData struct {
@@ -80,9 +84,9 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 
 	var data []StoredData
 
-	now := time.Now().UTC()
-	yesterday := time.Date(now.Year(), now.Month(), now.Day()-1, 0, 0, 0, 0, time.UTC)
-	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+	now := time.Now().In(timezoneLocation)
+	yesterday := time.Date(now.Year(), now.Month(), now.Day()-1, 0, 0, 0, 0, timezoneLocation)
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, timezoneLocation)
 	measurementQuery := datastore.NewQuery("Measurement").Filter("recorded >=", yesterday).Filter("recorded <", today).Order("-recorded").Limit(48)
 	_, err := client.GetAll(ctx, measurementQuery, &data)
 	if err != nil {
@@ -111,17 +115,20 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 }
 
 func main() {
+	// Make the handler available for Remote Procedure Call by AWS Lambda
+	defer lambda.Start(handler)
+
 	ctx = context.Background()
 
 	// Creates a client.
 	var credentials []byte
 	credentials, startupError = base64.StdEncoding.DecodeString(GCPcredJSON)
 	if startupError != nil {
-		lambda.Start(handler)
 		return
 	}
 	client, startupError = datastore.NewClient(ctx, GCPprojectID, option.WithCredentialsJSON(credentials))
-
-	// Make the handler available for Remote Procedure Call by AWS Lambda
-	lambda.Start(handler)
+	if startupError != nil {
+		return
+	}
+	timezoneLocation, startupError := time.LoadLocation(DataTimezone)
 }
