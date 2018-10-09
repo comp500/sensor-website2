@@ -7,37 +7,44 @@ window.addEventListener("load", function(event) {
 		`;
 	}
 	
-	var currentMeasurementTime = null;
+	var currentMeasurementTimeSeconds = null;
 	window.setInterval(function () {
-		if (currentMeasurementTime != null) {
-			currentMeasurementTime++;
-			document.getElementById("measurementTime").innerText = currentMeasurementTime;
+		if (currentMeasurementTimeSeconds != null) {
+			currentMeasurementTimeSeconds++;
+			document.getElementById("measurementTime").innerText = currentMeasurementTimeSeconds;
 		}
 	}, 1000);
+
+	var currentTimeOffset = 0;
+	var currentMeasurementTime = Date.now();
+
+	function updateLiveTime() {
+		// Get time difference in seconds
+		var difference = (((Date.now() + currentTimeOffset) - currentMeasurementTime) / 1000).toFixed(0);
+		document.getElementById("measurementTime").innerText = difference;
+		currentMeasurementTimeSeconds = difference;
+
+		var statusEl = document.getElementById("systemStatus");
+		if (difference > 172800) {
+			statusEl.className = "text-danger";
+			statusEl.innerText = "Broken (greater than two days since last recording)";
+		} else if (difference > 3600) {
+			statusEl.className = "text-warning";
+			statusEl.innerText = "Problematic (greater than one hour since last recording)";
+		} else if (difference > 300) {
+			statusEl.className = "text-info";
+			statusEl.innerText = "Slow (greater than 5 minutes since last recording)";
+		} else {
+			statusEl.className = "text-success";
+			statusEl.innerText = "Fully operational";
+		}
+	}
 	
 	function updateLive(data) {
 		Object.keys(data).forEach((sensorID) => {
 			if (sensorID == "time") {
-				var date = new Date(data[sensorID]);
-				// Get time difference in seconds
-				var difference = ((Date.now() - date) / 1000).toFixed(0);
-				document.getElementById("measurementTime").innerText = difference;
-				currentMeasurementTime = difference;
-	
-				var statusEl = document.getElementById("systemStatus");
-				if (difference > 172800) {
-					statusEl.className = "text-danger";
-					statusEl.innerText = "Broken (greater than two days since last recording)";
-				} else if (difference > 3600) {
-					statusEl.className = "text-warning";
-					statusEl.innerText = "Problematic (greater than one hour since last recording)";
-				} else if (difference > 300) {
-					statusEl.className = "text-info";
-					statusEl.innerText = "Slow (greater than 5 minutes since last recording)";
-				} else {
-					statusEl.className = "text-success";
-					statusEl.innerText = "Fully operational";
-				}
+				currentMeasurementTime = new Date(data[sensorID]);
+				updateLiveTime();
 			} else {
 				var sensorEl = document.getElementById("live-" + sensorID);
 				if (sensorEl) {
@@ -59,6 +66,21 @@ window.addEventListener("load", function(event) {
 	}
 
 	if (pubnub) {
+		var startTime = Date.now();
+		// Correct system clock offset using PubNub time api
+		pubnub.time(function(status, response) {
+			if (status.error) {
+				sendAlert(status.errorData.message);
+			} else {
+				var latency = (Date.now() - startTime) / 2;
+				var serverTime = (response.timetoken / 10000) + latency;
+				currentTimeOffset = serverTime - Date.now();
+				// Update existing indicators if they have been set yet
+				if (currentMeasurementTimeSeconds != null) {
+					updateLiveTime();
+				}
+			}
+		});
 		pubnub.history({
 			channel: "measurement",
 			count: 50
