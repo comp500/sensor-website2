@@ -35,7 +35,7 @@ var dataCacheStore dataCache
 // Cached data for the current day
 type dataCache struct {
 	today  time.Time
-	m      *sync.RWMutex
+	m      sync.RWMutex
 	output []byte
 }
 
