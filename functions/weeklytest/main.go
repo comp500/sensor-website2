@@ -113,7 +113,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 
 		var data []StoredData
 
-		measurementQuery := datastore.NewQuery("Measurement").Filter("recorded >=", before).Filter("recorded <", today).Limit(48)
+		measurementQuery := datastore.NewQuery("Measurement").Limit(48)
 		_, err := client.GetAll(ctx, measurementQuery, &data)
 		if err != nil {
 			return events.APIGatewayProxyResponse{
