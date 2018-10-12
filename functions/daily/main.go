@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"sync"
 	"time"
 
 	"cloud.google.com/go/datastore"
@@ -28,6 +29,15 @@ var client *datastore.Client
 var startupError error
 var ctx context.Context
 var timezoneLocation *time.Location
+
+var dataCacheStore dataCache
+
+// Cached data for the current day
+type dataCache struct {
+	today  time.Time
+	m      *sync.RWMutex
+	output []byte
+}
 
 // StoredData is a single cloud datastore entity
 type StoredData struct {
@@ -82,27 +92,54 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		}, nil
 	}
 
-	var data []StoredData
+	var output []byte
 
 	now := time.Now().In(timezoneLocation)
 	yesterday := time.Date(now.Year(), now.Month(), now.Day()-1, 0, 0, 0, 0, timezoneLocation)
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, timezoneLocation)
-	measurementQuery := datastore.NewQuery("Measurement").Filter("recorded >=", yesterday).Filter("recorded <", today).Order("-recorded").Limit(48)
-	_, err := client.GetAll(ctx, measurementQuery, &data)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Body:       fmt.Sprintf("Failed to request data: %v", err),
-		}, nil
+
+	dataCacheStore.m.RLock()
+	usedCache := true
+	defer func () {
+		if (usedCache) {
+			dataCacheStore.m.RUnlock()
+		}
 	}
 
-	output, err := json.Marshal(data)
+	if dataCacheStore.output != nil && dataCacheStore.today.Equal(today) {
+		// Read from cache
+		output = dataCacheStore.output
+	} else {
+		// UGH why is there no idiomatic way to upgrade locks!
+		dataCacheStore.m.RUnlock()
+		dataCacheStore.m.Lock()
+		usedCache = false
 
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: 500,
-			Body:       fmt.Sprintf("Failed to serialize data: %v", err),
-		}, nil
+		var data []StoredData
+
+		measurementQuery := datastore.NewQuery("Measurement").Filter("recorded >=", yesterday).Filter("recorded <", today).Order("-recorded").Limit(48)
+		_, err := client.GetAll(ctx, measurementQuery, &data)
+		if err != nil {
+			return events.APIGatewayProxyResponse{
+				StatusCode: 500,
+				Body:       fmt.Sprintf("Failed to request data: %v", err),
+			}, nil
+		}
+
+		output, err = json.Marshal(data)
+		if err != nil {
+			return events.APIGatewayProxyResponse{
+				StatusCode: 500,
+				Body:       fmt.Sprintf("Failed to serialize data: %v", err),
+			}, nil
+		}
+
+		dataCacheStore.today = today
+		dataCacheStore.output = output
+
+		// Release the RWLock, gain the RLock
+		dataCacheStore.m.Unlock()
+		dataCacheStore.m.RLock()
 	}
 
 	return events.APIGatewayProxyResponse{
