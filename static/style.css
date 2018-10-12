@@ -50,3 +50,16 @@
 .jumbotron {
 	margin-top: 2rem;
 }
+
+html, body {
+	height: 100%;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+}
+
+.container {
+	flex-grow: 1;
+}
