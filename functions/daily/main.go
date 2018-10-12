@@ -122,7 +122,14 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 			}, nil
 		}
 
-		output, err = json.Marshal(data)
+		// Minify:
+		minifiedData := make([]map[string]string, len(data))
+		for i, v := range data {
+			minifiedData[i] = v.SensorValues
+			minifiedData["t"] = v.Recorded
+		}
+
+		output, err = json.Marshal(minifiedData)
 		if err != nil {
 			return events.APIGatewayProxyResponse{
 				StatusCode: 500,

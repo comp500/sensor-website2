@@ -74,14 +74,15 @@ window.addEventListener("load", function(event) {
 
 				var graphData = {};
 				data.forEach((currData) => {
-					var time = new Date(currData.Recorded);
-					Object.keys(currData.SensorValues).forEach((sensorID) => {
+					var time = new Date(currData.t);
+					Object.keys(currData).forEach((sensorID) => {
+						if (sensorID == "t") return;
 						if (!graphData[sensorID]) {
 							graphData[sensorID] = [];
 						}
 						graphData[sensorID].push({
 							x: time,
-							y: currData.SensorValues[sensorID]
+							y: currData[sensorID]
 						});
 					});
 				});
