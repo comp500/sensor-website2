@@ -98,22 +98,18 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	yesterday := time.Date(now.Year(), now.Month(), now.Day()-1, 0, 0, 0, 0, timezoneLocation)
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, timezoneLocation)
 
+	// Lock cache for reading
 	dataCacheStore.m.RLock()
-	usedCache := true
-	defer func () {
-		if (usedCache) {
-			dataCacheStore.m.RUnlock()
-		}
-	}
 
 	if dataCacheStore.output != nil && dataCacheStore.today.Equal(today) {
+		defer dataCacheStore.m.RUnlock() // Ensure lock is released after output written
 		// Read from cache
 		output = dataCacheStore.output
 	} else {
-		// UGH why is there no idiomatic way to upgrade locks!
+		// Upgrade RLock to RWLock (Lock)
 		dataCacheStore.m.RUnlock()
 		dataCacheStore.m.Lock()
-		usedCache = false
+		defer dataCacheStore.m.Unlock()
 
 		var data []StoredData
 
@@ -136,10 +132,6 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 
 		dataCacheStore.today = today
 		dataCacheStore.output = output
-
-		// Release the RWLock, gain the RLock
-		dataCacheStore.m.Unlock()
-		dataCacheStore.m.RLock()
 	}
 
 	return events.APIGatewayProxyResponse{
