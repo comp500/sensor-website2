@@ -123,10 +123,14 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		}
 
 		// Minify:
-		minifiedData := make([]map[string]string, len(data))
+		minifiedData := make([]map[string]interface{}, len(data)) // horribly generic map, but json.Marshal handles this
 		for i, v := range data {
-			minifiedData[i] = v.SensorValues
-			minifiedData["t"] = v.Recorded
+			// Loop over current sensor values
+			for j, w := range v.SensorValues {
+				// Convert indexes to strings
+				minifiedData[i][strconv.Itoa(j)] = w
+			}
+			minifiedData[i]["t"] = v.Recorded
 		}
 
 		output, err = json.Marshal(minifiedData)
