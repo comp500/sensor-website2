@@ -95,7 +95,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	var output []byte
 
 	now := time.Now().In(timezoneLocation)
-	before := time.Date(now.Year(), now.Month(), now.Day()-5, 0, 0, 0, 0, timezoneLocation)
+	//before := time.Date(now.Year(), now.Month(), now.Day()-5, 0, 0, 0, 0, timezoneLocation)
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, timezoneLocation)
 
 	// Lock cache for reading
