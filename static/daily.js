@@ -88,6 +88,9 @@ window.addEventListener("load", function(event) {
 				});
 
 				Object.keys(charts).forEach((sensorID) => {
+					graphData[sensorID].sort((a, b) => {
+						return a.x - b.x;
+					});
 					charts[sensorID].chart.data.datasets[0].data = graphData[sensorID];
 					charts[sensorID].chart.update();
 				});
