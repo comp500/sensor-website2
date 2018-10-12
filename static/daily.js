@@ -97,7 +97,7 @@ window.addEventListener("load", function(event) {
 		}
 	};
 
-	oReq.open("GET", "/.netlify/functions/daily");
+	oReq.open("GET", "/.netlify/functions/weeklytest");
 	oReq.send();
 
 }, false);
