@@ -1,6 +1,31 @@
-.base {
-	padding: 3rem 1.5rem;
-	text-align: center;
+html, body {
+	height: 100%;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+}
+
+body .container {
+	flex-grow: 1;
+}
+
+body .navbar {
+	flex-shrink: 0;
+}
+
+.footer {
+	width: 100%;
+	background-color: #f5f5f5;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+.graph-container {
+	width: 90%;
+	margin: auto;
+	margin-bottom: 1rem;
 }
 
 .alert {
@@ -21,19 +46,6 @@
 	background-color: #3498db;
 }
 
-.footer {
-	width: 100%;
-	background-color: #f5f5f5;
-	padding-top: 20px;
-	padding-bottom: 20px;
-}
-
-.graph-container {
-	width: 90%;
-	margin: auto;
-	margin-bottom: 1rem;
-}
-
 .small-unit {
 	font-size: 0.5em;
 }
@@ -49,17 +61,4 @@
 
 .jumbotron {
 	margin-top: 2rem;
-}
-
-html, body {
-	height: 100%;
-}
-
-body {
-	display: flex;
-	flex-direction: column;
-}
-
-.container {
-	flex-grow: 1;
 }
